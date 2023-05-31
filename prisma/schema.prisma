@@ -12,12 +12,6 @@ datasource db {
     relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -56,6 +50,13 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+
+    // none-next-auth
+    likes     RecipeLike[]
+    recipes   Recipe[]
+    followers User[]       @relation(name: "Followers")
+    follows   User[]       @relation(name: "Followers")
+    bookmarks Bookmark[]
 }
 
 model VerificationToken {
@@ -64,4 +65,56 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Recipe {
+    id             String       @id @default(uuid())
+    userId         String
+    title          String       @db.Text
+    description    String       @db.Text
+    image          String       @db.Text
+    readyInMinutes Int
+    vegan          Boolean
+    vegetarian     Boolean
+    veryHealthy    Boolean
+    user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    ingredients    Ingredient[]
+    likes          RecipeLike[]
+    bookmarks      Bookmark[]
+
+    @@index([userId])
+}
+
+model Ingredient {
+    id          String @id @default(uuid())
+    recipeId    String
+    title       String @db.Text
+    description String @db.Text
+    image       String @db.Text
+    measures    String @db.Text
+    recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+    @@index([recipeId])
+}
+
+model Bookmark {
+    userId   String
+    recipeId String
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+    @@id([userId, recipeId])
+    @@index([userId])
+    @@index([recipeId])
+}
+
+model RecipeLike {
+    userId   String
+    recipeId String
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+    @@id([userId, recipeId])
+    @@index([userId])
+    @@index([recipeId])
 }
