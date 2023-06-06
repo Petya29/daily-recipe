@@ -14,19 +14,21 @@ datasource db {
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
+    id                String   @id @default(cuid())
     userId            String
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String? @db.Text
-    access_token      String? @db.Text
+    refresh_token     String?  @db.Text
+    access_token      String?  @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String? @db.Text
+    id_token          String?  @db.Text
     session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+    user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
     @@index([userId])
@@ -37,6 +39,8 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId])
@@ -48,6 +52,8 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
     accounts      Account[]
     sessions      Session[]
 
@@ -63,6 +69,8 @@ model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
     @@unique([identifier, token])
 }
@@ -77,6 +85,8 @@ model Recipe {
     vegan          Boolean
     vegetarian     Boolean
     veryHealthy    Boolean
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
     user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
     ingredients    Ingredient[]
     likes          RecipeLike[]
@@ -86,22 +96,26 @@ model Recipe {
 }
 
 model Ingredient {
-    id          String @id @default(uuid())
+    id          String   @id @default(uuid())
     recipeId    String
-    title       String @db.Text
-    description String @db.Text
-    image       String @db.Text
-    measures    String @db.Text
-    recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    title       String   @db.Text
+    description String   @db.Text
+    image       String   @db.Text
+    measures    String   @db.Text
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
     @@index([recipeId])
 }
 
 model Bookmark {
-    userId   String
-    recipeId String
-    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    userId    String
+    recipeId  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
     @@id([userId, recipeId])
     @@index([userId])
@@ -109,10 +123,12 @@ model Bookmark {
 }
 
 model RecipeLike {
-    userId   String
-    recipeId String
-    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    userId    String
+    recipeId  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
     @@id([userId, recipeId])
     @@index([userId])
