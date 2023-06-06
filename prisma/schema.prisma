@@ -34,6 +34,7 @@ model User {
     name      String?
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
+    role      Role      @default(USER)
     accounts  Account[]
 
     // none-next-auth
