@@ -5,7 +5,7 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
@@ -47,9 +47,15 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    CredentialsProvider({
+      type: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        pasword: { label: "Password", type: "password" },
+      },
+      authorize(credentials, req) {
+        return null;
+      }
     }),
     /**
      * ...add more providers here.
